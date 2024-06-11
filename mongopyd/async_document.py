@@ -44,23 +44,39 @@ def need_database_and_collection(func):
 
             if database is not None:
                 
-                database = get_database(
+                _database = get_database(
+                    mode='async',
                     alias=database
-                ).db
+                )
+
+                if _database is None:
+                    raise RuntimeError(
+                        f'No database was found for the alias `{database}` and no default database was found either.'
+                        )
+                else:
+                    database = _database.db
 
             else:
 
                 try:
-                    db_name = self.Settings.db_name
+                    db_alias = self.Settings.db_alias
                 except AttributeError:
                     """
                     It will get the default database configured in the method: configure database(...)
                     """
-                    db_name = None
+                    db_alias = None
 
-                database = get_database(
-                    alias=db_name
-                ).db
+                _database = get_database(
+                    mode='async',
+                    alias=db_alias
+                )
+
+                if _database is None:
+                    raise RuntimeError(
+                        f'No database was found for the alias `{db_alias}` and no default database was found either.'
+                        )
+                else:
+                    database = _database.db
 
 
         if not isinstance(database, motor.motor_asyncio.AsyncIOMotorDatabase):
@@ -111,7 +127,8 @@ def need_database_and_collection(func):
 
 
 
-class Document(BaseModel):
+
+class AsyncDocument(BaseModel):
 
     id: Optional[PydanticObjectId] = Field(default=None, alias='_id')
 
@@ -126,7 +143,7 @@ class Document(BaseModel):
 
     class Settings():
         name = None
-        db_name = None
+        db_alias = None
         indexes = []
 
 

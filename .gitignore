@@ -104,3 +104,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Others
+test.py
+teste.py
