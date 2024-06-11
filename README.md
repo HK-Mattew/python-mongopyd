@@ -1,0 +1,1 @@
+# Simple and efficient Pydantic-based models for MongoDB (PyMongo & Motor)
