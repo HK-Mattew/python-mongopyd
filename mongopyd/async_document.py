@@ -126,6 +126,107 @@ def need_database_and_collection(func):
     return wrapper
 
 
+def need_database_and_collection_for_async_generator(func):
+
+    @functools.wraps(func)
+    def wrapper(
+        self,
+        *args,
+        database: Optional[Union[str, motor.motor_asyncio.AsyncIOMotorDatabase]] = None,
+        collection: Optional[Union[str, motor.motor_asyncio.AsyncIOMotorCollection]] = None,
+        **kwargs):
+
+
+        if database is None or isinstance(database, str):
+
+            if database is not None:
+                
+                _database = get_database(
+                    mode='async',
+                    alias=database
+                )
+
+                if _database is None:
+                    raise RuntimeError(
+                        f'No database was found for the alias `{database}` and no default database was found either.'
+                        )
+                else:
+                    database = _database.db
+
+            else:
+
+                try:
+                    db_alias = self.Settings.db_alias
+                except AttributeError:
+                    """
+                    It will get the default database configured in the method: configure database(...)
+                    """
+                    db_alias = None
+
+                _database = get_database(
+                    mode='async',
+                    alias=db_alias
+                )
+
+                if _database is None:
+                    raise RuntimeError(
+                        f'No database was found for the alias `{db_alias}` and no default database was found either.'
+                        )
+                else:
+                    database = _database.db
+
+
+        if not isinstance(database, motor.motor_asyncio.AsyncIOMotorDatabase):
+            raise RuntimeError(
+                f"Database instance `{database.__class__}` is invalid." \
+                     f" It must be an instance of: `<class 'motor.motor_asyncio.AsyncIOMotorDatabase'>`"
+                )
+
+
+        if collection is None or isinstance(collection, str):
+
+            if collection is not None:
+
+                collection = database.get_collection(
+                    collection
+                    )
+            else:
+
+                try:
+                    coll_name = self.Settings.name
+                except AttributeError:
+                    raise AttributeError(f'The Settings.name must be specified in the model.')
+                
+                if coll_name is None:
+                    raise ValueError('The Settings.name must be specified in the model.')
+
+                collection = database.get_collection(
+                    coll_name
+                    )
+                
+     
+        if not isinstance(collection, motor.motor_asyncio.AsyncIOMotorCollection):
+            
+            raise RuntimeError(
+                f"Collection instance `{collection.__class__}` is invalid." \
+                     f" It must be an instance of: `<class 'motor.motor_asyncio.AsyncIOMotorCollection'>`"
+                )
+
+        func_async_generator = func(
+            self,
+            *args,
+            database=database,
+            collection=collection,
+            **kwargs
+            )
+        
+        return func_async_generator
+
+    
+    return wrapper
+
+
+
 
 
 class AsyncDocument(BaseModel):
@@ -174,7 +275,7 @@ class AsyncDocument(BaseModel):
 
 
     @classmethod
-    @need_database_and_collection
+    @need_database_and_collection_for_async_generator
     async def find(
         self,
         filter: Mapping[str, Any],
