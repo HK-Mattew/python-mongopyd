@@ -8,7 +8,7 @@ from typing import (
 
 DATABASES: Dict[str, DataBase] = {}
 
-DEFAULT_DATABASE = None
+DEFAULT_DATABASE_ALIAS = None
 
 
 
@@ -30,7 +30,7 @@ def configure_databases(
         raise ValueError('DataBase list is empty')
 
 
-    _DEFAULT_DATABASE = None
+    _DEFAULT_DATABASE_ALIAS = None
 
     for database in databases:
 
@@ -38,32 +38,36 @@ def configure_databases(
             raise ValueError(f'The database list must contain only {DataBase} objects')
 
 
-        DATABASES[database.db.name] = database
+        if get_database(alias=database.alias):
+            raise ValueError('Database aliases must be unique')
 
-        if database.is_default and _DEFAULT_DATABASE is not None:
+
+        DATABASES[database.alias] = database
+
+        if database.is_default and _DEFAULT_DATABASE_ALIAS is not None:
             raise ValueError('Only one database can be set as default')
         
         if database.is_default:
-            _DEFAULT_DATABASE = database
+            _DEFAULT_DATABASE_ALIAS = database.alias
 
 
-    if _DEFAULT_DATABASE is None:
+    if _DEFAULT_DATABASE_ALIAS is None:
         raise ValueError('At least one database must be defined as default')
 
 
-    global DEFAULT_DATABASE
-    DEFAULT_DATABASE = _DEFAULT_DATABASE
+    global DEFAULT_DATABASE_ALIAS
+    DEFAULT_DATABASE_ALIAS = _DEFAULT_DATABASE_ALIAS
 
     return get_databases()
 
 
 
-def get_database(name: str = None) -> DataBase:
+def get_database(alias: str = None) -> DataBase:
 
-    if name is not None:
-        return DATABASES[name]
+    if alias is not None:
+        return DATABASES[alias]
     else:
-        return DEFAULT_DATABASE
+        return DATABASES[DEFAULT_DATABASE_ALIAS]
 
 
 

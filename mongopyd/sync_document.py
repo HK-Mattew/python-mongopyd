@@ -42,7 +42,7 @@ def need_database_and_collection(func):
             if database is not None:
                 
                 database = get_database(
-                    name=database
+                    alias=database
                 ).db
 
             else:
@@ -56,7 +56,7 @@ def need_database_and_collection(func):
                     db_name = None
 
                 database = get_database(
-                    name=db_name
+                    alias=db_name
                 ).db
 
 

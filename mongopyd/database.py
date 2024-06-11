@@ -9,6 +9,7 @@ import pymongo
 
 @dataclass
 class DataBase:
+    alias: str
     db: Union[pymongo.database.Database, motor.motor_asyncio.AsyncIOMotorDatabase]
     is_default: bool = False
 
