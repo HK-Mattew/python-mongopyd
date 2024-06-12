@@ -21,6 +21,8 @@ from pymongo.errors import (
 )
 import functools
 
+import pymongo.results
+
 from . import get_database
 from .src.custom_types import PydanticObjectId
 
@@ -374,6 +376,19 @@ class Document(BaseModel):
         
         self.reload_with_dict(result)
         return True
+
+
+    @classmethod
+    @need_database_and_collection
+    def count_documents(
+        self,
+        filter: Mapping[str, Any],
+        database: Optional[Union[str, pymongo.database.Database]] = None,
+        collection: Optional[Union[str, pymongo.collection.Collection]] = None,
+        **kwargs: Any
+        ) -> int:
+
+        return collection.count_documents(filter, **kwargs) 
 
 
     @need_database_and_collection

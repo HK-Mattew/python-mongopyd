@@ -482,6 +482,19 @@ class AsyncDocument(BaseModel):
         return True
 
 
+    @classmethod
+    @need_database_and_collection
+    async def count_documents(
+        self,
+        filter: Mapping[str, Any],
+        database: Optional[Union[str, motor.motor_asyncio.AsyncIOMotorDatabase]] = None,
+        collection: Optional[Union[str, motor.motor_asyncio.AsyncIOMotorCollection]] = None,
+        **kwargs: Any
+        ) -> int:
+
+        return await collection.count_documents(filter, **kwargs)
+
+
     @need_database_and_collection
     async def reload(
         self,
