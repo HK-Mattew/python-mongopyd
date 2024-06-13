@@ -19,8 +19,8 @@ ASYNC_DEFAULT_DATABASE_ALIAS = None
 
 
 def configure_databases(
-        databases: List[DataBase]
-    ) -> Dict[str, Union[DataBase, AsyncDataBase]]:
+        databases: List[Union[DataBase, AsyncDataBase]]
+    ) -> Dict[Literal['sync', 'async'], Dict[str, Union[DataBase, AsyncDataBase]]]:
 
 
     if len(DATABASES) > 0 or len(ASYNC_DATABASES) > 0:
@@ -86,7 +86,14 @@ def configure_databases(
     global ASYNC_DEFAULT_DATABASE_ALIAS
     ASYNC_DEFAULT_DATABASE_ALIAS = _ASYNC_DEFAULT_DATABASE_ALIAS
 
-    return get_databases(mode='sync').update(get_databases(mode='async'))
+
+    _RETURN_DATABASES = {
+        'sync': get_databases(mode='sync'),
+        'async': get_databases(mode='async')
+    }
+
+    return _RETURN_DATABASES
+
 
 
 
