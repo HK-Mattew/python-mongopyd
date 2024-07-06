@@ -411,7 +411,7 @@ class AsyncDocument(BaseModel):
     @need_database_and_collection
     async def insert(
         self,
-        allow_nulls: bool=False,
+        allow_nulls: bool= False,
         database: Optional[Union[str, motor.motor_asyncio.AsyncIOMotorDatabase]] = None,
         collection: Optional[Union[str, motor.motor_asyncio.AsyncIOMotorCollection]] = None,
         **kwargs
@@ -421,9 +421,14 @@ class AsyncDocument(BaseModel):
         if allow_nulls:
             doc_data = self.model_dump(by_alias=True)
         else:
-            doc_data = dict(filter(
-                lambda x: x[1] != None, self.model_dump(by_alias=True).items()
-            ))
+            doc_data = self.model_dump(
+                by_alias=True,
+                exclude_none=True
+            )
+
+
+        if '_id' in doc_data and doc_data['_id'] is None:
+            del doc_data['_id']
 
 
         try:
@@ -437,12 +442,9 @@ class AsyncDocument(BaseModel):
                 f' | Server error: {err._message}'
             )
 
-        if result.inserted_id:
-            self.reload_with_dict({'_id': result.inserted_id})
+        self.reload_with_dict({'_id': result.inserted_id})
 
-            return result.inserted_id
-        else:
-            return False
+        return result.inserted_id
 
 
     @need_database_and_collection

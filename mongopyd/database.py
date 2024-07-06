@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import motor.motor_asyncio
-import pymongo
+import pymongo.database
 
 
 
