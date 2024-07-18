@@ -17,6 +17,7 @@ class EmbeddedDocument(BaseModel):
         json_encoders = {
             PydanticObjectId: lambda v: str(v),
         }
+        arbitrary_types_allowed = True
 
 
 

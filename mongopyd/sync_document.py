@@ -1,6 +1,7 @@
 from pydantic import (
     BaseModel,
-    Field
+    Field,
+    Extra
 )
 from typing import (
     List,
@@ -131,7 +132,7 @@ class Document(BaseModel):
 
     # Pydantic configs: https://docs.pydantic.dev/latest/usage/model_config/#options
     class Config():
-        extra = 'allow'
+        extra = Extra.allow
         json_encoders = {
             PydanticObjectId: lambda v: str(v),
         }
