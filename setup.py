@@ -25,7 +25,7 @@ def get_requirements() -> List[str]:
 
 setup(
       name='python-mongopyd',
-      version='0.1',
+      version='0.1.1',
       description='Simple and efficient Pydantic-based models for MongoDB (PyMongo & Motor)',
       long_description=Path('README.md').read_text(encoding='UTF-8'),
       author='HK-Mattew',
