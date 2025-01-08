@@ -240,6 +240,7 @@ class AsyncDocument(BaseModel):
         extra = Extra.allow
         json_encoders = {
             PydanticObjectId: lambda v: str(v),
+            ObjectId: lambda v: str(v),
         }
         arbitrary_types_allowed = True
 

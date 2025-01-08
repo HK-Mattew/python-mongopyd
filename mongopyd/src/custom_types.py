@@ -12,14 +12,11 @@ import yaml
 
 
 def func_validade_objectid(value: Any):
-
-    if not isinstance(value, ObjectId):
-        raise TypeError('ObjectId required')
     
-    # if not ObjectId.is_valid(v):
-    #     raise ValueError('Invalid ObjectId')
+    if not ObjectId.is_valid(value):
+        raise ValueError('Invalid ObjectId')
 
-    return value
+    return ObjectId(value)
 
 
 
